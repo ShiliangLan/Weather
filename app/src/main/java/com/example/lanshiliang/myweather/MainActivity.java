@@ -1,15 +1,22 @@
 package com.example.lanshiliang.myweather;
 
+import android.Manifest;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -27,33 +34,60 @@ import org.json.JSONObject;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 
 public class MainActivity extends Activity {
-    private LinearLayout linearLayout ;
-    private TextView tvCity,tvTmp,tvPm25,tvQua,tvSug,tvWd,tvWp;
-    private WeatherInfo weatherInfoJson ;
+    private LinearLayout linearLayout;
+    private TextView tvCity, tvTmp, tvPm25, tvQua, tvSug, tvWd, tvWp;
+    private WeatherInfo weatherInfoJson;
     private String url;
     private String cityKey = "101240706";
-    private String time ;
+    private String time;
+    private LocationManager locationManager;
+    private String provider;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.drawlayout);
         setView();
         getParams();
-        url = "http://zhwnlapi.etouch.cn/Ecalender/api/v2/weather?date="+time+"&citykey="+cityKey ;
+        url = "http://zhwnlapi.etouch.cn/Ecalender/api/v2/weather?date=" + time + "&citykey=" + cityKey;
         updateUI();
     }
 
-    public void getParams(){
+    public void getParams() {
         Date date = new Date(System.currentTimeMillis());
-        DateFormat format=new SimpleDateFormat("yyyyMMdd");
+        DateFormat format = new SimpleDateFormat("yyyyMMdd");
         time = format.format(date);
         Intent intent = getIntent();
-        if ( null != intent.getStringExtra("cityKey")){
+        if (null != intent.getStringExtra("cityKey")) {
             cityKey = intent.getStringExtra("cityKey");
+        }
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        List<String> providerList = locationManager.getProviders(true);
+        if (providerList.contains(LocationManager.GPS_PROVIDER)) {
+            provider = LocationManager.GPS_PROVIDER;
+        } else if (providerList.contains(LocationManager.NETWORK_PROVIDER)) {
+            provider = LocationManager.NETWORK_PROVIDER;
+        } else {
+            Toast.makeText(this, "No location pricoder to use", Toast.LENGTH_SHORT).show();
+        }
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        Location location = locationManager.getLastKnownLocation(provider);
+        if (location != null){
+            Log.d("北纬", String.valueOf(location.getLatitude()));
+            Log.d("东经", String.valueOf(location.getLongitude()));
         }
     }
 
@@ -85,7 +119,7 @@ public class MainActivity extends Activity {
                         tvWd.setText(weatherInfoJson.getObserve().getWd());
                         tvWp.setText(weatherInfoJson.getObserve().getWp());
                         RequestQueue nQueue = Volley.newRequestQueue(MyApplication.getContext());
-                        ImageRequest imageRequest = new ImageRequest(weatherInfoJson.getForecast().get(1).getDay().getBgPic(), new Response.Listener<Bitmap>() {
+                        ImageRequest imageRequest = new ImageRequest(weatherInfoJson.getForecast().get(1).getNight().getBgPic(), new Response.Listener<Bitmap>() {
                             @Override
                             public void onResponse(Bitmap bitmap) {
                                 linearLayout.setBackground(new BitmapDrawable(bitmap));

@@ -14,7 +14,8 @@ import java.io.UnsupportedEncodingException;
 
 /**
  * Created by lanshiliang on 2016/2/12.
- * 改变解码方式
+ * 由于GSON的解码方式不是utf-8
+ * 所以改变解码方式
  */
 public class ReJsonRequest extends JsonObjectRequest {
 

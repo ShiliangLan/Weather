@@ -6,8 +6,11 @@
     android:id="@+id/mainContent">
 
     <TextView
+        android:layout_gravity="center"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textSize="50sp"
+        android:textColor="#003"
         android:id="@+id/TvCity"/>
 
     <TableLayout
