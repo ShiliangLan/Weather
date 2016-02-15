@@ -24,6 +24,8 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.lanshiliang.myweather.model.County;
+import com.example.lanshiliang.myweather.model.WeatherDB;
 import com.example.lanshiliang.myweather.model.WeatherInfo;
 import com.example.lanshiliang.myweather.util.MyApplication;
 import com.example.lanshiliang.myweather.util.ReJsonRequest;
@@ -55,6 +57,7 @@ public class MainActivity extends Activity {
         getParams();
         url = "http://zhwnlapi.etouch.cn/Ecalender/api/v2/weather?date=" + time + "&citykey=" + cityKey;
         updateUI();
+
     }
 
     public void getParams() {
