@@ -128,6 +128,7 @@ public class WeatherDB {
         Iterator iterator = map.keySet().iterator();
         while(iterator.hasNext()){
             String pro = (String) iterator.next(); //省名
+//            System.out.println("--->"+pro);
             db.execSQL("insert into Province (province_name) values (?)", new String[]{pro}); //插入
             Cursor cursor = db.rawQuery("select * from Province where province_name = ?", new String[]{pro});
             cursor.moveToFirst();

@@ -11,8 +11,13 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -25,6 +30,7 @@ import com.android.volley.toolbox.ImageRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.lanshiliang.myweather.model.County;
+import com.example.lanshiliang.myweather.model.Province;
 import com.example.lanshiliang.myweather.model.WeatherDB;
 import com.example.lanshiliang.myweather.model.WeatherInfo;
 import com.example.lanshiliang.myweather.util.MyApplication;
@@ -41,33 +47,50 @@ import java.util.List;
 
 public class MainActivity extends Activity {
     private LinearLayout linearLayout;
+    private DrawerLayout drawerLayout;
     private TextView tvCity, tvTmp, tvPm25, tvQua, tvSug, tvWd, tvWp;
     private WeatherInfo weatherInfoJson;
     private String url;
-    private String cityKey = "101240706";
+    private String cityKey ;
     private String time;
     private LocationManager locationManager;
     private String provider;
+    private WeatherDB weatherDB;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.drawlayout);
-        setView();
+        weatherDB = WeatherDB.getInstance(getApplicationContext());
+        if(weatherDB.loadProvince().size() == 0){
+            weatherDB.saveDB();
+        }
+//        List <Province> list =weatherDB.loadProvince();
+//        for(Province s : list){
+//            System.out.println(s.getProvinceName());
+//        }
+        final NavigationView navigationView = (NavigationView) findViewById(R.id.na_view);
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(MenuItem item) {
+                item.setChecked(true);
+                drawerLayout.closeDrawers();
+                return false;
+            }
+        });
         getParams();
-        url = "http://zhwnlapi.etouch.cn/Ecalender/api/v2/weather?date=" + time + "&citykey=" + cityKey;
-        updateUI();
+        if(cityKey == null){
+            Intent i = new Intent(MainActivity.this,SelectCity.class);
+            i .putExtra("select", "province");
+            startActivity(i);
+        }else {
+            setView();
+            url = "http://zhwnlapi.etouch.cn/Ecalender/api/v2/weather?date=" + time + "&citykey=" + cityKey;
+            updateUI();
+        }
 
     }
-
-    public void getParams() {
-        Date date = new Date(System.currentTimeMillis());
-        DateFormat format = new SimpleDateFormat("yyyyMMdd");
-        time = format.format(date);
-        Intent intent = getIntent();
-        if (null != intent.getStringExtra("cityKey")) {
-            cityKey = intent.getStringExtra("cityKey");
-        }
+    public void getLocation(){
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         List<String> providerList = locationManager.getProviders(true);
         if (providerList.contains(LocationManager.GPS_PROVIDER)) {
@@ -93,8 +116,19 @@ public class MainActivity extends Activity {
             Log.d("东经", String.valueOf(location.getLongitude()));
         }
     }
+    public void getParams() {
+        Date date = new Date(System.currentTimeMillis());
+        DateFormat format = new SimpleDateFormat("yyyyMMdd");
+        time = format.format(date);
+        Intent intent = getIntent();
+        if (null != intent.getStringExtra("cityKey")) {
+            cityKey = intent.getStringExtra("cityKey");
+        }
+
+    }
 
     public void setView(){
+        drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         linearLayout = (LinearLayout) findViewById(R.id.mainContent);
         tvCity = (TextView) findViewById(R.id.TvCity);
         tvTmp = (TextView) findViewById(R.id.TvTmp);
