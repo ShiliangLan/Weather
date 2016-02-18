@@ -26,6 +26,12 @@ public class WeatherOpenHelper extends SQLiteOpenHelper {
             +"ping_yin text, "
             +"key text, "
             +"city_id integer)";
+    /**
+     * 用来保存用户已经保存的城市列表
+     */
+    public static final String CREATE_EXIST_CITY = "create table ExistCity ("
+            +"id integer primary key autoincrement, "
+            +"key text)";
 
     public WeatherOpenHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
         super(context, name, factory, version);
@@ -36,6 +42,7 @@ public class WeatherOpenHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_PROVINCE);//建立Province表
         db.execSQL(CREATE_CITY);
         db.execSQL(CREATE_COUNTY);
+        db.execSQL(CREATE_EXIST_CITY);
     }
 
     @Override

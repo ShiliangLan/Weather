@@ -3,7 +3,6 @@ package com.example.lanshiliang.myweather;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -31,7 +30,6 @@ public class SelectCity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.city_list);
-        System.out.println(3);
         listView = (ListView) findViewById(R.id.cityList);
         Intent intent = getIntent();
         select = intent.getStringExtra("select");
@@ -84,8 +82,10 @@ public class SelectCity extends Activity {
             listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    String key = list.get(position).getCityKey();
+                    weatherDB.saveExistCity(key);
                     Intent i =new Intent(SelectCity.this,MainActivity.class);
-                    i.putExtra("cityKey",list.get(position).getCityKey());
+                    i.putExtra("cityKey",key);
                     startActivity(i);
                 }
             });

@@ -41,6 +41,30 @@ public class WeatherDB {
         return weatherDB;
     }
 
+    public void saveExistCity(String key){
+        db.execSQL("insert into ExistCity (key) values(?)",new String[]{key});
+    }
+    public void delExistCity(String key){
+        db.execSQL("delete from ExistCity where key = ?",new String[]{key});
+    }
+    /**
+     * 加载已保存城市的列表
+     * @return
+     */
+    public List<String> loadExistCity(){
+        List <String> list = new ArrayList<String>();
+        Cursor cursor = db.query("ExistCity",null,null,null,null,null,null);
+        if(cursor.moveToFirst()){
+            do{
+                list.add(cursor.getString(cursor.getColumnIndex("key")));
+            }while(cursor.moveToNext());
+        }
+        if(cursor != null){
+            cursor.close();
+        }
+        return list;
+    }
+
     /**
      * 从数据库中读取全国省份信息
      */
@@ -49,12 +73,12 @@ public class WeatherDB {
 
         Cursor cursor = db.query("Province",null,null,null,null,null,null);
         if (cursor.moveToFirst()){
-            while(cursor.moveToNext()){
+            do{
                 Province province = new Province();
                 province.setId(cursor.getInt(cursor.getColumnIndex("id")));
                 province.setProvinceName(cursor.getString(cursor.getColumnIndex("province_name")));
                 list.add(province);
-            }
+            }while(cursor.moveToNext());
         }
         if(cursor != null){
             cursor.close();
@@ -69,13 +93,13 @@ public class WeatherDB {
 
         Cursor cursor = db.query("City",null,"province_id = ?",new String[]{String.valueOf(provinceId)},null,null,null);
         if (cursor.moveToFirst()){
-            while(cursor.moveToNext()){
+            do{
                 City city = new City();
                 city.setId(cursor.getInt(cursor.getColumnIndex("id")));
                 city.setCityName(cursor.getString(cursor.getColumnIndex("city_name")));
                 city.setProvinceId(provinceId);
                 list.add(city);
-            }
+            }while(cursor.moveToNext());
         }
         if(cursor != null){
             cursor.close();
@@ -91,13 +115,15 @@ public class WeatherDB {
 
         Cursor cursor = db.query("County",null,"city_id = ?",new String[]{String.valueOf(cityId)},null,null,null);
         if (cursor.moveToFirst()){
-            while(cursor.moveToNext()){
+            do{
                 County county = new County();
                 county.setId(cursor.getInt(cursor.getColumnIndex("id")));
                 county.setCountyName(cursor.getString(cursor.getColumnIndex("county_name")));
+                county.setCityKey(cursor.getString(cursor.getColumnIndex("key")));
+                county.setPinyin(cursor.getString(cursor.getColumnIndex("ping_yin")));
                 county.setCityId(cityId);
                 list.add(county);
-            }
+            }while(cursor.moveToNext());
         }
         if(cursor != null){
             cursor.close();
@@ -128,7 +154,6 @@ public class WeatherDB {
         Iterator iterator = map.keySet().iterator();
         while(iterator.hasNext()){
             String pro = (String) iterator.next(); //省名
-//            System.out.println("--->"+pro);
             db.execSQL("insert into Province (province_name) values (?)", new String[]{pro}); //插入
             Cursor cursor = db.rawQuery("select * from Province where province_name = ?", new String[]{pro});
             cursor.moveToFirst();

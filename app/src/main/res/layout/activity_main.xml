@@ -59,10 +59,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/TvQua"/>
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/TvSug"/>
+
             </LinearLayout>
 
             <LinearLayout
@@ -80,7 +77,10 @@
         </TableRow>
 
     </TableLayout>
-
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/TvSug"/>
 
 
 
