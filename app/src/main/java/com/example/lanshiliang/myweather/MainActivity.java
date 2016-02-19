@@ -1,26 +1,20 @@
 package com.example.lanshiliang.myweather;
 
-import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
-import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -59,10 +53,8 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.drawlayout);
-
         loadUI();
     }
-
 
     public void loadUI(){
         weatherDB = WeatherDB.getInstance(getApplicationContext());
@@ -80,7 +72,7 @@ public class MainActivity extends Activity {
             menu.clear();
             menu.add(R.id.cityListGroup, ADD_CITY_ID, 0, "添加城市");
             for (int i = 0;i< list.size();i++){
-                menu.add(R.id.cityListGroup, Integer.parseInt(list.get(i)), i+1,list.get(i));
+                menu.add(R.id.cityListGroup, Integer.parseInt(list.get(i)), i+1,weatherDB.queryCityName(list.get(i)));
             }
 
 
@@ -117,33 +109,6 @@ public class MainActivity extends Activity {
         loadUI();
     }
 
-    public void getLocation(){
-        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        List<String> providerList = locationManager.getProviders(true);
-        if (providerList.contains(LocationManager.GPS_PROVIDER)) {
-            provider = LocationManager.GPS_PROVIDER;
-        } else if (providerList.contains(LocationManager.NETWORK_PROVIDER)) {
-            provider = LocationManager.NETWORK_PROVIDER;
-        } else {
-            Toast.makeText(this, "No location pricoder to use", Toast.LENGTH_SHORT).show();
-        }
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
-        }
-        Location location = locationManager.getLastKnownLocation(provider);
-        if (location != null){
-            Log.d("北纬", String.valueOf(location.getLatitude()));
-            Log.d("东经", String.valueOf(location.getLongitude()));
-        }
-    }
-
     public void setView(){
         navigationView = (NavigationView) findViewById(R.id.na_view);
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
@@ -178,6 +143,7 @@ public class MainActivity extends Activity {
         Date date = new Date(System.currentTimeMillis());
         DateFormat format = new SimpleDateFormat("yyyyMMdd");
         time = format.format(date);
+        System.out.println(time);
         Intent intent = getIntent();
         if (null != intent.getStringExtra("cityKey")) {
             cityKey = intent.getStringExtra("cityKey");

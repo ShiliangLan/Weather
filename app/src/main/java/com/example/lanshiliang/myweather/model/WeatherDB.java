@@ -40,7 +40,11 @@ public class WeatherDB {
         }
         return weatherDB;
     }
-
+    public String queryCityName(String key){
+        Cursor cursor = db.rawQuery("select * from County where key = ?", new String[]{key});
+        cursor.moveToFirst();
+        return cursor.getString(cursor.getColumnIndex("county_name"));
+    }
     public void saveExistCity(String key){
         db.execSQL("insert into ExistCity (key) values(?)",new String[]{key});
     }
